@@ -1,0 +1,110 @@
+#include "FileUtils.hpp"
+#include <iostream>
+#include <xlnt/xlnt.hpp>
+
+using namespace std;
+
+// ── Save products to xlsx ────────────────────
+void saveProducts(const string& filename, const vector<Product>& products) {
+    xlnt::workbook wb;
+    auto ws = wb.active_sheet();
+    ws.title("Products");
+
+    ws.cell("A1").value("ID");
+    ws.cell("B1").value("Name");
+    ws.cell("C1").value("Category");
+    ws.cell("D1").value("Price");
+    ws.cell("E1").value("Stock");
+
+    int row = 2;
+    for (auto& p : products) {
+        ws.cell("A" + to_string(row)).value(p.getId());
+        ws.cell("B" + to_string(row)).value(p.getName());
+        ws.cell("C" + to_string(row)).value(p.getCategory());
+        ws.cell("D" + to_string(row)).value(p.getPrice());
+        ws.cell("E" + to_string(row)).value(p.getStock());
+        row++;
+    }
+
+    wb.save(filename);
+    cout << "  Data saved to " << filename << "\n";
+}
+
+// ── Load products from xlsx ──────────────────
+vector<Product> loadProducts(const string& filename) {
+    vector<Product> products;
+    xlnt::workbook wb;
+
+    try {
+        wb.load(filename);
+    } catch (...) {
+        return products;   // file doesn't exist yet — that's fine
+    }
+
+    auto ws = wb.active_sheet();
+    for (auto row : ws.rows(false)) {
+        if (row[0].to_string() == "ID") continue;
+        try {
+            int    id       = stoi(row[0].to_string());
+            string name     = row[1].to_string();
+            string category = row[2].to_string();
+            double price    = stod(row[3].to_string());
+            int    stock    = stoi(row[4].to_string());
+            products.emplace_back(id, name, category, price, stock);
+        } catch (...) {
+            // skip corrupted rows
+        }
+    }
+    return products;
+}
+
+// ── Save accounts to xlsx ────────────────────
+void saveAccounts(const string& filename, const vector<User*>& users) {
+    xlnt::workbook wb;
+    auto ws = wb.active_sheet();
+    ws.title("Accounts");
+
+    ws.cell("A1").value("Username");
+    ws.cell("B1").value("Password");
+    ws.cell("C1").value("IsAdmin");
+
+    int row = 2;
+    for (auto* u : users) {
+        ws.cell("A" + to_string(row)).value(u->getUsername());
+        ws.cell("B" + to_string(row)).value(u->getPassword());
+        ws.cell("C" + to_string(row)).value(u->isAdmin() ? 1 : 0);
+        row++;
+    }
+
+    wb.save(filename);
+}
+
+// ── Load accounts from xlsx ──────────────────
+vector<User*> loadAccounts(const string& filename) {
+    vector<User*> users;
+    xlnt::workbook wb;
+
+    try {
+        wb.load(filename);
+    } catch (...) {
+        return users;   // file doesn't exist yet — that's fine
+    }
+
+    auto ws = wb.active_sheet();
+    for (auto row : ws.rows(false)) {
+        if (row[0].to_string() == "Username") continue;
+        try {
+            string uname   = row[0].to_string();
+            string pass    = row[1].to_string();
+            bool   isAdmin = (row[2].to_string() == "1");
+
+            if (isAdmin)
+                users.push_back(new AdminUser(uname, pass));
+            else
+                users.push_back(new RegularUser(uname, pass));
+        } catch (...) {
+            // skip corrupted rows
+        }
+    }
+    return users;
+}

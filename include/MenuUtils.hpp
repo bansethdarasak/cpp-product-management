@@ -1,9 +1,12 @@
 #pragma once
-#include <vector>
 #include <string>
-#include "Student.hpp"
+#include <vector>
+#include "Product.hpp"
 
-using std::vector; 
-using std::string; 
-void displayTable(const vector<Student> &students);
-void printMenu(const vector<string> &items);
+using std::string;
+using std::vector;
+
+void printMenu(const vector<string>& items);
+void printProducts(const vector<Product>& products);
+void clearScreen();
+void pauseScreen();

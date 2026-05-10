@@ -29,9 +29,13 @@ FetchContent_MakeAvailable(tabulate)
 # Executable
 add_executable(ProductManagementApp
     main.cpp
-    src/Student.cpp
-    src/ExcelUtils.cpp
+    src/Product.cpp
+    src/User.cpp
+    src/FileUtils.cpp
     src/MenuUtils.cpp
+    src/InputUtils.cpp
+    src/AuthManager.cpp
+    src/ProductCatalog.cpp
 )
 
 # Include headers

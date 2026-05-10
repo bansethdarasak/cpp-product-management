@@ -1,72 +1,102 @@
 #include <iostream>
 #include <vector>
-#include "Student.hpp"
-#include "ExcelUtils.hpp"
+#include <string>
+#include "AuthManager.hpp"
+#include "ProductCatalog.hpp"
 #include "MenuUtils.hpp"
+#include "InputUtils.hpp"
 
 using namespace std;
 
+void productMenu(User* user, ProductCatalog& catalog) {
+    vector<string> adminMenu = {
+        "View Products (by Category)",
+        "Search Products",
+        "Sort Products",
+        "Add Product",
+        "Update Product",
+        "Delete Product",
+        "Logout"
+    };
+    vector<string> userMenu = {
+        "View Products (by Category)",
+        "Search Products",
+        "Sort Products",
+        "Logout"
+    };
+
+    bool running = true;
+    while (running) {
+        clearScreen();
+        cout << "  Logged in as: " << user->getUsername()
+             << " [" << user->getRole() << "]\n\n";
+
+        if (user->isAdmin())
+            printMenu(adminMenu);
+        else
+            printMenu(userMenu);
+
+        int maxOption = user->isAdmin() ? 7 : 4;
+        int choice = getInt(">> Choose option: ", 1, maxOption);
+
+        if (user->isAdmin()) {
+            switch (choice) {
+                case 1: catalog.viewByCategory(); break;
+                case 2: catalog.searchProducts(); break;
+                case 3: catalog.sortProducts();   break;
+                case 4: catalog.addProduct();     break;
+                case 5: catalog.updateProduct();  break;
+                case 6: catalog.deleteProduct();  break;
+                case 7: running = false; cout << "  Logged out.\n"; break;
+            }
+        } else {
+            switch (choice) {
+                case 1: catalog.viewByCategory(); break;
+                case 2: catalog.searchProducts(); break;
+                case 3: catalog.sortProducts();   break;
+                case 4: running = false; cout << "  Logged out.\n"; break;
+            }
+        }
+
+        if (running) pauseScreen();
+    }
+}
+
 int main() {
-    system("clear");
-    string filename = "studentdata.xlsx";
-    vector<Student> students = readExcelToVector(filename);
+    AuthManager   auth("accounts.xlsx");
+    ProductCatalog catalog("products.xlsx");
 
     vector<string> mainMenu = {
-        "Add New Records",
-        "Delete the Record",
-        "Update the record",
-        "Show all records",
+        "Login",
+        "Sign Up",
         "Exit"
     };
 
-    int option;
-    do {
+    bool running = true;
+    while (running) {
+        clearScreen();
+        cout << "\n  === PRODUCT MANAGEMENT SYSTEM ===\n\n";
         printMenu(mainMenu);
-        cout << ">> Choose your option: ";
-        cin >> option;
 
-        switch (option) {
+        int choice = getInt(">> Choose option: ", 1, 3);
+
+        switch (choice) {
             case 1: {
-                cout << "Adding new student 📖!!" << endl;
-                cout << "Enter Student Name: ";
-                string name;
-                cin.ignore();
-                getline(cin, name);
-
-                int age;
-                cout << "Enter student age: ";
-                cin >> age;
-
-                students.emplace_back(name, age);
-                writeExcel(filename, students);
+                User* user = auth.login();
+                if (user) productMenu(user, catalog);
+                else pauseScreen();
                 break;
             }
-            case 2: {
-                int index;
-                cout << "Choose index of student to delete: ";
-                cin >> index;
-
-                if (index < 1 || index > students.size()) {
-                    cout << "Invalid index ❌" << endl;
-                    break;
-                }
-
-                students.erase(students.begin() + index - 1);
-                writeExcel(filename, students);
-                cout << "Successfully deleted the data 🥡" << endl;
+            case 2:
+                auth.signup();
+                pauseScreen();
                 break;
-            }
             case 3:
-                // Optional: implement record editing logic
-                break;
-            case 4:
-                displayTable(students);
-                break;
-            case 5:
+                running = false;
+                cout << "\n  Goodbye!\n\n";
                 break;
         }
-
-    } while (option != 5);
+    }
 
     return 0;
 }
