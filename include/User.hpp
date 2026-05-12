@@ -3,7 +3,7 @@
 
 using std::string;
 
-// Base class (abstract) — OOP: inheritance + polymorphism
+
 class User {
 protected:
     string username;

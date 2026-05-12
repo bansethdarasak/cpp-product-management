@@ -1,9 +1,21 @@
 #include "MenuUtils.hpp"
 #include <iostream>
+#include <sstream>
 #include <tabulate/table.hpp>
 
 using namespace std;
 using namespace tabulate;
+
+// prints every line of a table with leading spaces to center it
+static void printCentered(Table& t, int padding = 10) {
+    string indent(padding, ' ');
+    stringstream ss;
+    ss << t;
+    string line;
+    while (getline(ss, line))
+        cout << indent << line << "\n";
+    cout << "\n";
+}
 
 void printMenu(const vector<string>& items) {
     Table t;
@@ -11,7 +23,7 @@ void printMenu(const vector<string>& items) {
     for (size_t i = 0; i < items.size(); i++)
         t.add_row({to_string(i + 1), items[i]});
     t[0].format().font_style({FontStyle::bold});
-    cout << t << endl;
+    printCentered(t);
 }
 
 void printProducts(const vector<Product>& products) {
@@ -19,7 +31,6 @@ void printProducts(const vector<Product>& products) {
         cout << "  No products found.\n";
         return;
     }
-
     Table t;
     t.add_row({"ID", "Name", "Category", "Price ($)", "Stock"});
     for (auto& p : products) {
@@ -32,7 +43,7 @@ void printProducts(const vector<Product>& products) {
         });
     }
     t[0].format().font_style({FontStyle::bold});
-    cout << t << endl;
+    printCentered(t, 6);
 }
 
 void clearScreen() {

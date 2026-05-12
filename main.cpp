@@ -8,20 +8,36 @@
 
 using namespace std;
 
-void productMenu(User* user, ProductCatalog& catalog) {
+void deleteMenu(ProductCatalog& catalog, AuthManager& auth) {
+    cout << "\n[ DELETE ]\n";
+    cout << "  1. Delete User Account\n";
+    cout << "  2. Delete Product\n";
+    int choice = getInt(">> Choose option: ", 1, 2);
+
+    if (choice == 1)
+        auth.deleteUser();
+    else
+        catalog.deleteProduct();
+}
+
+void productMenu(User* user, ProductCatalog& catalog, AuthManager& auth) {
+
     vector<string> adminMenu = {
         "View Products (by Category)",
         "Search Products",
         "Sort Products",
         "Add Product",
         "Update Product",
-        "Delete Product",
+        "Delete Account / Product",
+        "Review Pending Products",
         "Logout"
     };
+
     vector<string> userMenu = {
         "View Products (by Category)",
         "Search Products",
         "Sort Products",
+        "Submit Product for Approval",
         "Logout"
     };
 
@@ -36,25 +52,27 @@ void productMenu(User* user, ProductCatalog& catalog) {
         else
             printMenu(userMenu);
 
-        int maxOption = user->isAdmin() ? 7 : 4;
+        int maxOption = user->isAdmin() ? 8 : 5;
         int choice = getInt(">> Choose option: ", 1, maxOption);
 
         if (user->isAdmin()) {
             switch (choice) {
-                case 1: catalog.viewByCategory(); break;
-                case 2: catalog.searchProducts(); break;
-                case 3: catalog.sortProducts();   break;
-                case 4: catalog.addProduct();     break;
-                case 5: catalog.updateProduct();  break;
-                case 6: catalog.deleteProduct();  break;
-                case 7: running = false; cout << "  Logged out.\n"; break;
+                case 1: catalog.viewByCategory();              break;
+                case 2: catalog.searchProducts();              break;
+                case 3: catalog.sortProducts();                break;
+                case 4: catalog.addProduct();                  break;
+                case 5: catalog.updateProduct();               break;
+                case 6: deleteMenu(catalog, auth);             break;
+                case 7: catalog.reviewPending();               break;
+                case 8: running = false; cout << "  Logged out.\n"; break;
             }
         } else {
             switch (choice) {
                 case 1: catalog.viewByCategory(); break;
                 case 2: catalog.searchProducts(); break;
                 case 3: catalog.sortProducts();   break;
-                case 4: running = false; cout << "  Logged out.\n"; break;
+                case 4: catalog.submitProduct();  break;
+                case 5: running = false; cout << "  Logged out.\n"; break;
             }
         }
 
@@ -63,8 +81,8 @@ void productMenu(User* user, ProductCatalog& catalog) {
 }
 
 int main() {
-    AuthManager   auth("accounts.xlsx");
-    ProductCatalog catalog("products.xlsx");
+    AuthManager    auth("accounts.xlsx");
+    ProductCatalog catalog("products.xlsx", "pending.xlsx");
 
     vector<string> mainMenu = {
         "Login",
@@ -83,7 +101,7 @@ int main() {
         switch (choice) {
             case 1: {
                 User* user = auth.login();
-                if (user) productMenu(user, catalog);
+                if (user) productMenu(user, catalog, auth);
                 else pauseScreen();
                 break;
             }

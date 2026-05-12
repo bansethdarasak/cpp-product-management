@@ -4,12 +4,8 @@
 
 using namespace std;
 
-// ── Save products to xlsx ────────────────────
-void saveProducts(const string& filename, const vector<Product>& products) {
-    xlnt::workbook wb;
-    auto ws = wb.active_sheet();
-    ws.title("Products");
-
+// ── helper: write a product list to any xlsx file ───
+static void writeProductSheet(xlnt::worksheet& ws, const vector<Product>& products) {
     ws.cell("A1").value("ID");
     ws.cell("B1").value("Name");
     ws.cell("C1").value("Category");
@@ -25,22 +21,17 @@ void saveProducts(const string& filename, const vector<Product>& products) {
         ws.cell("E" + to_string(row)).value(p.getStock());
         row++;
     }
-
-    wb.save(filename);
-    cout << "  Data saved to " << filename << "\n";
 }
 
-// ── Load products from xlsx ──────────────────
-vector<Product> loadProducts(const string& filename) {
+// ── helper: read a product list from any xlsx file ──
+static vector<Product> readProductSheet(const string& filename) {
     vector<Product> products;
     xlnt::workbook wb;
-
     try {
         wb.load(filename);
     } catch (...) {
-        return products;   // file doesn't exist yet — that's fine
+        return products;
     }
-
     auto ws = wb.active_sheet();
     for (auto row : ws.rows(false)) {
         if (row[0].to_string() == "ID") continue;
@@ -51,14 +42,39 @@ vector<Product> loadProducts(const string& filename) {
             double price    = stod(row[3].to_string());
             int    stock    = stoi(row[4].to_string());
             products.emplace_back(id, name, category, price, stock);
-        } catch (...) {
-            // skip corrupted rows
-        }
+        } catch (...) {}
     }
     return products;
 }
 
-// ── Save accounts to xlsx ────────────────────
+// ── Products ─────────────────────────────────
+void saveProducts(const string& filename, const vector<Product>& products) {
+    xlnt::workbook wb;
+    auto ws = wb.active_sheet();
+    ws.title("Products");
+    writeProductSheet(ws, products);
+    wb.save(filename);
+    cout << "  Data saved to " << filename << "\n";
+}
+
+vector<Product> loadProducts(const string& filename) {
+    return readProductSheet(filename);
+}
+
+// ── Pending products ──────────────────────────
+void savePending(const string& filename, const vector<Product>& products) {
+    xlnt::workbook wb;
+    auto ws = wb.active_sheet();
+    ws.title("Pending");
+    writeProductSheet(ws, products);
+    wb.save(filename);
+}
+
+vector<Product> loadPending(const string& filename) {
+    return readProductSheet(filename);
+}
+
+// ── Accounts ─────────────────────────────────
 void saveAccounts(const string& filename, const vector<User*>& users) {
     xlnt::workbook wb;
     auto ws = wb.active_sheet();
@@ -75,21 +91,17 @@ void saveAccounts(const string& filename, const vector<User*>& users) {
         ws.cell("C" + to_string(row)).value(u->isAdmin() ? 1 : 0);
         row++;
     }
-
     wb.save(filename);
 }
 
-// ── Load accounts from xlsx ──────────────────
 vector<User*> loadAccounts(const string& filename) {
     vector<User*> users;
     xlnt::workbook wb;
-
     try {
         wb.load(filename);
     } catch (...) {
-        return users;   // file doesn't exist yet — that's fine
+        return users;
     }
-
     auto ws = wb.active_sheet();
     for (auto row : ws.rows(false)) {
         if (row[0].to_string() == "Username") continue;
@@ -97,14 +109,11 @@ vector<User*> loadAccounts(const string& filename) {
             string uname   = row[0].to_string();
             string pass    = row[1].to_string();
             bool   isAdmin = (row[2].to_string() == "1");
-
             if (isAdmin)
                 users.push_back(new AdminUser(uname, pass));
             else
                 users.push_back(new RegularUser(uname, pass));
-        } catch (...) {
-            // skip corrupted rows
-        }
+        } catch (...) {}
     }
     return users;
 }

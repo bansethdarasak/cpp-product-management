@@ -17,7 +17,7 @@ public:
     AuthManager(string accountFile);
     ~AuthManager();
 
-    // Returns nullptr if login fails (caller does NOT own the pointer)
     User* login();
     bool  signup();
+    void  deleteUser();
 };

@@ -8,17 +8,24 @@
 
 using namespace std;
 
-ProductCatalog::ProductCatalog(string dataFile) : dataFile(dataFile), nextId(1) {
+ProductCatalog::ProductCatalog(string dataFile, string pendingFile)
+    : dataFile(dataFile), pendingFile(pendingFile), nextId(1) {
     products = loadProducts(dataFile);
+    pending  = loadPending(pendingFile);
+
+    // find highest ID across both lists so IDs never clash
     for (auto& p : products)
+        if (p.getId() >= nextId) nextId = p.getId() + 1;
+    for (auto& p : pending)
         if (p.getId() >= nextId) nextId = p.getId() + 1;
 }
 
 ProductCatalog::~ProductCatalog() {
-    saveProducts(dataFile, products);
+    saveProducts(dataFile,    products);
+    savePending (pendingFile, pending);
 }
 
-// ── Add ──────────────────────────────────────
+// ── Add (admin direct) ───────────────────────
 void ProductCatalog::addProduct() {
     cout << "\n[ ADD PRODUCT ]\n";
     flushLine();
@@ -31,6 +38,57 @@ void ProductCatalog::addProduct() {
     products.emplace_back(nextId++, name, category, price, stock);
     saveProducts(dataFile, products);
     cout << "  Product added successfully.\n";
+}
+
+// ── Submit (user — goes to pending) ──────────
+void ProductCatalog::submitProduct() {
+    cout << "\n[ SUBMIT PRODUCT FOR APPROVAL ]\n";
+    flushLine();
+
+    string name     = getNonEmptyString("Name     : ");
+    string category = getNonEmptyString("Category : ");
+    double price    = getPositiveDouble ("Price  $ : ");
+    int    stock    = getInt            ("Stock    : ", 0, INT_MAX);
+
+    pending.emplace_back(nextId++, name, category, price, stock);
+    savePending(pendingFile, pending);
+    cout << "  Submitted! Waiting for admin approval.\n";
+}
+
+// ── Review pending (admin) ───────────────────
+void ProductCatalog::reviewPending() {
+    cout << "\n[ REVIEW PENDING PRODUCTS ]\n";
+
+    if (pending.empty()) {
+        cout << "  No pending products to review.\n";
+        return;
+    }
+
+    // walk through each pending product one by one
+    vector<Product> stillPending;
+
+    for (auto& p : pending) {
+        cout << "\n";
+        printProducts({p});
+        cout << "  Approve this product? (y = approve / n = reject / s = skip): ";
+        char c; cin >> c;
+
+        if (c == 'y' || c == 'Y') {
+            products.push_back(p);
+            saveProducts(dataFile, products);
+            cout << "  Approved! Product added to catalog.\n";
+        } else if (c == 'n' || c == 'N') {
+            cout << "  Rejected. Product removed.\n";
+            // just don't add to stillPending — it's gone
+        } else {
+            // skip — leave it in pending for later
+            stillPending.push_back(p);
+            cout << "  Skipped. Will review later.\n";
+        }
+    }
+
+    pending = stillPending;
+    savePending(pendingFile, pending);
 }
 
 // ── View by Category ─────────────────────────

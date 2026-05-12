@@ -8,7 +8,6 @@ using namespace std;
 AuthManager::AuthManager(string accountFile) : accountFile(accountFile) {
     users = loadAccounts(accountFile);
 
-    // Seed a default admin if no accounts exist
     bool hasAdmin = false;
     for (auto* u : users)
         if (u->isAdmin()) { hasAdmin = true; break; }
@@ -29,7 +28,6 @@ bool AuthManager::usernameExists(const string& username) {
     return false;
 }
 
-// Returns a raw pointer into the internal list — caller does NOT delete it
 User* AuthManager::login() {
     cout << "\n[ LOGIN ]\n";
     string uname = getUsername("Username: ");
@@ -57,4 +55,46 @@ bool AuthManager::signup() {
     saveAccounts(accountFile, users);
     cout << "  Account created! You can now log in.\n";
     return true;
+}
+
+void AuthManager::deleteUser() {
+    cout << "\n[ DELETE USER ACCOUNT ]\n";
+
+    // show all regular users
+    cout << "  Regular accounts:\n";
+    bool any = false;
+    for (auto* u : users) {
+        if (!u->isAdmin()) {
+            cout << "  - " << u->getUsername() << "\n";
+            any = true;
+        }
+    }
+    if (!any) {
+        cout << "  No regular users found.\n";
+        return;
+    }
+
+    flushLine();
+    string target = getNonEmptyString("Enter username to delete: ");
+
+    for (auto it = users.begin(); it != users.end(); it++) {
+        if ((*it)->getUsername() == target) {
+            if ((*it)->isAdmin()) {
+                cout << "  Cannot delete an admin account.\n";
+                return;
+            }
+            cout << "  Are you sure you want to delete \"" << target << "\"? (y/n): ";
+            char c; cin >> c;
+            if (c == 'y' || c == 'Y') {
+                delete *it;
+                users.erase(it);
+                saveAccounts(accountFile, users);
+                cout << "  User deleted.\n";
+            } else {
+                cout << "  Cancelled.\n";
+            }
+            return;
+        }
+    }
+    cout << "  Username not found.\n";
 }
