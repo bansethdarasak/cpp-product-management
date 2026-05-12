@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include "User.hpp"
+#include "ProductCatalog.hpp"
 
 using std::string;
 using std::vector;
@@ -19,5 +20,5 @@ public:
 
     User* login();
     bool  signup();
-    void  deleteUser();
+    void  deleteUser(ProductCatalog& catalog);
 };

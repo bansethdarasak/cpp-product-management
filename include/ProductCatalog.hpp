@@ -19,13 +19,16 @@ public:
     ~ProductCatalog();
 
     // Admin only
-    void addProduct();
+    void addProduct(const string& username);
     void updateProduct();
     void deleteProduct();
-    void reviewPending();     // approve / reject user submissions
+    void reviewPending();
+    void deleteByOwner(const string& username);  // wipe all products when user deleted
+
+    // User only
+    void submitProduct(const string& username);
 
     // All users
-    void submitProduct();     // user submits — goes to pending
     void viewByCategory();
     void searchProducts();
     void sortProducts();

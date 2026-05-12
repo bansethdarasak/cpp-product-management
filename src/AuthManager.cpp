@@ -7,11 +7,9 @@ using namespace std;
 
 AuthManager::AuthManager(string accountFile) : accountFile(accountFile) {
     users = loadAccounts(accountFile);
-
     bool hasAdmin = false;
     for (auto* u : users)
         if (u->isAdmin()) { hasAdmin = true; break; }
-
     if (!hasAdmin) {
         users.push_back(new AdminUser("admin", "admin123"));
         saveAccounts(accountFile, users);
@@ -32,11 +30,9 @@ User* AuthManager::login() {
     cout << "\n[ LOGIN ]\n";
     string uname = getUsername("Username: ");
     string pass  = getPassword("Password: ");
-
     for (auto* u : users)
         if (u->getUsername() == uname && u->getPassword() == pass)
             return u;
-
     cout << "  Invalid credentials.\n";
     return nullptr;
 }
@@ -44,12 +40,10 @@ User* AuthManager::login() {
 bool AuthManager::signup() {
     cout << "\n[ SIGN UP ]\n";
     string uname = getUsername("Username (3-20 chars, no spaces): ");
-
     if (usernameExists(uname)) {
         cout << "  Username already taken.\n";
         return false;
     }
-
     string pass = getPassword("Password (min 6 chars): ");
     users.push_back(new RegularUser(uname, pass));
     saveAccounts(accountFile, users);
@@ -57,10 +51,9 @@ bool AuthManager::signup() {
     return true;
 }
 
-void AuthManager::deleteUser() {
+void AuthManager::deleteUser(ProductCatalog& catalog) {
     cout << "\n[ DELETE USER ACCOUNT ]\n";
 
-    // show all regular users
     cout << "  Regular accounts:\n";
     bool any = false;
     for (auto* u : users) {
@@ -83,13 +76,14 @@ void AuthManager::deleteUser() {
                 cout << "  Cannot delete an admin account.\n";
                 return;
             }
-            cout << "  Are you sure you want to delete \"" << target << "\"? (y/n): ";
+            cout << "  Delete \"" << target << "\" and all their products? (y/n): ";
             char c; cin >> c;
             if (c == 'y' || c == 'Y') {
+                catalog.deleteByOwner(target);   // wipe their products first
                 delete *it;
                 users.erase(it);
                 saveAccounts(accountFile, users);
-                cout << "  User deleted.\n";
+                cout << "  User account deleted.\n";
             } else {
                 cout << "  Cancelled.\n";
             }

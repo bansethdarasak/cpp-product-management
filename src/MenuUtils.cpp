@@ -6,7 +6,6 @@
 using namespace std;
 using namespace tabulate;
 
-// prints every line of a table with leading spaces to center it
 static void printCentered(Table& t, int padding = 10) {
     string indent(padding, ' ');
     stringstream ss;
@@ -32,14 +31,15 @@ void printProducts(const vector<Product>& products) {
         return;
     }
     Table t;
-    t.add_row({"ID", "Name", "Category", "Price ($)", "Stock"});
+    t.add_row({"ID", "Name", "Category", "Price ($)", "Stock", "Ownership"});
     for (auto& p : products) {
         t.add_row({
             to_string(p.getId()),
             p.getName(),
             p.getCategory(),
             to_string(p.getPrice()),
-            to_string(p.getStock())
+            to_string(p.getStock()),
+            p.getOwner()
         });
     }
     t[0].format().font_style({FontStyle::bold});

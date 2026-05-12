@@ -13,9 +13,8 @@ void deleteMenu(ProductCatalog& catalog, AuthManager& auth) {
     cout << "  1. Delete User Account\n";
     cout << "  2. Delete Product\n";
     int choice = getInt(">> Choose option: ", 1, 2);
-
     if (choice == 1)
-        auth.deleteUser();
+        auth.deleteUser(catalog);
     else
         catalog.deleteProduct();
 }
@@ -57,22 +56,22 @@ void productMenu(User* user, ProductCatalog& catalog, AuthManager& auth) {
 
         if (user->isAdmin()) {
             switch (choice) {
-                case 1: catalog.viewByCategory();              break;
-                case 2: catalog.searchProducts();              break;
-                case 3: catalog.sortProducts();                break;
-                case 4: catalog.addProduct();                  break;
-                case 5: catalog.updateProduct();               break;
-                case 6: deleteMenu(catalog, auth);             break;
-                case 7: catalog.reviewPending();               break;
+                case 1: catalog.viewByCategory();                    break;
+                case 2: catalog.searchProducts();                    break;
+                case 3: catalog.sortProducts();                      break;
+                case 4: catalog.addProduct(user->getUsername());     break;
+                case 5: catalog.updateProduct();                     break;
+                case 6: deleteMenu(catalog, auth);                   break;
+                case 7: catalog.reviewPending();                     break;
                 case 8: running = false; cout << "  Logged out.\n"; break;
             }
         } else {
             switch (choice) {
-                case 1: catalog.viewByCategory(); break;
-                case 2: catalog.searchProducts(); break;
-                case 3: catalog.sortProducts();   break;
-                case 4: catalog.submitProduct();  break;
-                case 5: running = false; cout << "  Logged out.\n"; break;
+                case 1: catalog.viewByCategory();                     break;
+                case 2: catalog.searchProducts();                     break;
+                case 3: catalog.sortProducts();                       break;
+                case 4: catalog.submitProduct(user->getUsername());   break;
+                case 5: running = false; cout << "  Logged out.\n";  break;
             }
         }
 
