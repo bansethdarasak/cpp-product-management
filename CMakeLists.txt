@@ -39,7 +39,7 @@ add_executable(ProductManagementApp
 )
 
 # Include headers
-target_include_directories(ProductManagementApp PRIVATE include)
+target_include_directories(ProductManagementApp PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 # Link libraries
 target_link_libraries(ProductManagementApp PRIVATE xlnt tabulate)
