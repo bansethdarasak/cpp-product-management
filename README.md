@@ -35,13 +35,13 @@ to the following header files inside the generated `build` directory.
 
 ## Files to Edit
 
-### 1. `build/_deps/xlnt-src/source/detail/serialization/phonetic_run.hpp`
+### 1. `build/_deps/xlnt-src/include/cell/phonetic_run.hpp`
 
-### 2. `build/_deps/xlnt-src/source/utils/time.hpp`
+### 2. `build/_deps/xlnt-src/include/utils/time.hpp`
 
-### 3. `build/_deps/xlnt-src/source/utils/timedelta.hpp`
+### 3. `build/_deps/xlnt-src/include/utils/timedelta.hpp`
 
-### 4. `build/_deps/xlnt-src/source/utils/variant.hpp`
+### 4. `build/_deps/xlnt-src/include/utils/variant.hpp`
 
 ---
 
