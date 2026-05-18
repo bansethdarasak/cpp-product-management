@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <tabulate/table.hpp>
+#include <iomanip>
 
 using namespace std;
 using namespace tabulate;
@@ -37,7 +38,7 @@ void printProducts(const vector<Product>& products) {
             to_string(p.getId()),
             p.getName(),
             p.getCategory(),
-            to_string(p.getPrice()),
+            ([&]{ ostringstream oss; oss << fixed << setprecision(2) << p.getPrice(); return oss.str(); })(),
             to_string(p.getStock()),
             p.getOwner()
         });

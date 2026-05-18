@@ -33,7 +33,7 @@ void ProductCatalog::addProduct(const string& username) {
     int    stock    = getInt            ("Stock    : ", 0, INT_MAX);
     products.emplace_back(nextId++, name, category, price, stock, username);
     saveProducts(dataFile, products);
-    cout << "  Product added successfully.\n";
+    cout << "Product added successfully.\n";
 }
 
 // ── Submit (user → pending) ──────────────────
@@ -46,7 +46,7 @@ void ProductCatalog::submitProduct(const string& username) {
     int    stock    = getInt            ("Stock    : ", 0, INT_MAX);
     pending.emplace_back(nextId++, name, category, price, stock, username);
     savePending(pendingFile, pending);
-    cout << "  Submitted! Waiting for admin approval.\n";
+    cout << "Submitted! Waiting for admin approval.\n";
 }
 
 // ── Delete all products owned by a user ──────
@@ -63,14 +63,14 @@ void ProductCatalog::deleteByOwner(const string& username) {
     );
     saveProducts(dataFile,    products);
     savePending (pendingFile, pending);
-    cout << "  All products owned by \"" << username << "\" deleted.\n";
+    cout << "All products owned by \"" << username << "\" deleted.\n";
 }
 
 // ── Review pending (admin) ───────────────────
 void ProductCatalog::reviewPending() {
     cout << "\n[ REVIEW PENDING PRODUCTS ]\n";
     if (pending.empty()) {
-        cout << "  No pending products to review.\n";
+        cout << "No pending products to review.\n";
         return;
     }
     vector<Product> stillPending;
@@ -82,12 +82,12 @@ void ProductCatalog::reviewPending() {
         if (c == 'y' || c == 'Y') {
             products.push_back(p);
             saveProducts(dataFile, products);
-            cout << "  Approved!\n";
+            cout << "Approved!\n";
         } else if (c == 'n' || c == 'N') {
             cout << "  Rejected.\n";
         } else {
             stillPending.push_back(p);
-            cout << "  Skipped.\n";
+            cout << "Skipped.\n";
         }
     }
     pending = stillPending;
@@ -96,9 +96,10 @@ void ProductCatalog::reviewPending() {
 
 // ── View by Category ─────────────────────────
 void ProductCatalog::viewByCategory() {
-    cout << "\n[ VIEW PRODUCTS ]\n";
+    cout << "\n\n[ VIEW PRODUCTS ]\n";
     flushLine();
-    string cat = getOptionalString("Category (leave blank for ALL): ");
+    string cat = getOptionalString("\nCategory (leave blank for ALL): ");
+    cout << "\n";
     if (cat.empty()) { printProducts(products); return; }
     vector<Product> filtered;
     for (auto& p : products)
@@ -113,7 +114,7 @@ void ProductCatalog::updateProduct() {
     flushLine();
     for (auto& p : products) {
         if (p.getId() == id) {
-            cout << "  (Leave blank to keep current value)\n";
+            cout << "(Leave blank to keep current value)\n\n";
             string name     = getOptionalString("New Name     [" + p.getName()     + "]: ");
             string category = getOptionalString("New Category [" + p.getCategory() + "]: ");
             string priceStr = getOptionalString("New Price  $ [" + to_string(p.getPrice()) + "]: ");
@@ -124,22 +125,22 @@ void ProductCatalog::updateProduct() {
                 try {
                     double v = stod(priceStr);
                     if (v > 0) p.setPrice(v);
-                    else cout << "  Price must be > 0. Keeping current.\n";
-                } catch (...) { cout << "  Invalid price. Keeping current.\n"; }
+                    else cout << "Price must be > 0. Keeping current.\n";
+                } catch (...) { cout << "Invalid price. Keeping current.\n"; }
             }
             if (!stockStr.empty()) {
                 try {
                     int v = stoi(stockStr);
                     if (v >= 0) p.setStock(v);
-                    else cout << "  Stock cannot be negative. Keeping current.\n";
-                } catch (...) { cout << "  Invalid stock. Keeping current.\n"; }
+                    else cout << "Stock cannot be negative. Keeping current.\n";
+                } catch (...) { cout << "Invalid stock. Keeping current.\n"; }
             }
             saveProducts(dataFile, products);
-            cout << "  Product updated.\n";
+            cout << "Product updated.\n";
             return;
         }
     }
-    cout << "  Product ID not found.\n";
+    cout << "Product ID not found.\n";
 }
 
 // ── Delete ───────────────────────────────────
@@ -148,20 +149,20 @@ void ProductCatalog::deleteProduct() {
     int id = getInt("Enter product ID to delete: ", 1, INT_MAX);
     for (auto it = products.begin(); it != products.end(); it++) {
         if (it->getId() == id) {
-            cout << "  About to delete: " << it->getName() << "\n";
-            cout << "  Are you sure? (y/n): ";
+            cout << "About to delete: " << it->getName() << "\n";
+            cout << "Are you sure? (y/n): ";
             char c; cin >> c;
             if (c == 'y' || c == 'Y') {
                 products.erase(it);
                 saveProducts(dataFile, products);
-                cout << "  Product deleted.\n";
+                cout << "Product deleted.\n";
             } else {
-                cout << "  Cancelled.\n";
+                cout << "Cancelled.\n";
             }
             return;
         }
     }
-    cout << "  Product ID not found.\n";
+    cout << "Product ID not found.\n";
 }
 
 // ── Search ────────────────────────────────────
@@ -196,6 +197,7 @@ void ProductCatalog::sortProducts() {
     cout << "\n[ SORT PRODUCTS ]\n";
     int by    = getInt("Sort by  (1) Price  (2) Stock: ", 1, 2);
     int order = getInt("Order    (1) Ascending  (2) Descending: ", 1, 2);
+    cout << endl;
     vector<Product> sorted = products;
     if (by == 1) {
         sort(sorted.begin(), sorted.end(), [&](const Product& a, const Product& b) {

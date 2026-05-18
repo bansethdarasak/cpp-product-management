@@ -55,7 +55,7 @@ void saveProducts(const string& filename, const vector<Product>& products) {
     ws.title("Products");
     writeProductSheet(ws, products);
     wb.save(filename);
-    cout << "  Data saved to " << filename << "\n";
+    cout << "Data saved to " << filename << "\n";
 }
 
 vector<Product> loadProducts(const string& filename) {
