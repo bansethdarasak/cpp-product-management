@@ -18,7 +18,7 @@ public:
     string getPassword() const;
     bool   isAdmin()     const;
 
-    virtual string getRole() const = 0;   // pure virtual
+    virtual string getRole() const = 0;   
 };
 
 class AdminUser : public User {

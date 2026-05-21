@@ -12,9 +12,9 @@ int getInt(const string& prompt, int minVal = INT_MIN, int maxVal = INT_MAX) {
         if (cin >> value) {
             if (value >= minVal && value <= maxVal)
                 return value;
-            cout << "  Please enter a number between " << minVal << " and " << maxVal << ".\n";
+            cout << "Please enter a number between " << minVal << " and " << maxVal << ".\n";
         } else {
-            cout << "  Invalid input. Please enter a whole number.\n";
+            cout << "Invalid input. Please enter a whole number.\n";
             cin.clear();
             cin.ignore(1000, '\n');
         }
@@ -27,9 +27,9 @@ double getPositiveDouble(const string& prompt) {
         cout << prompt;
         if (cin >> value) {
             if (value > 0.0) return value;
-            cout << "  Price must be greater than 0.\n";
+            cout << "Price must be greater than 0.\n";
         } else {
-            cout << "  Invalid input. Enter a number like 9.99.\n";
+            cout << "Invalid input. Enter a number like 9.99.\n";
             cin.clear();
             cin.ignore(1000, '\n');
         }
@@ -48,7 +48,7 @@ string getNonEmptyString(const string& prompt) {
             value = value.substr(start, end - start + 1);
             if (!value.empty()) return value;
         }
-        cout << "  This field cannot be empty.\n";
+        cout << "This field cannot be empty.\n";
     }
 }
 
@@ -69,11 +69,11 @@ string getUsername(const string& prompt) {
         cout << prompt;
         cin >> value;
         if (value.size() < 3)
-            cout << "  Username must be at least 3 characters.\n";
+            cout << "Username must be at least 3 characters.\n";
         else if (value.size() > 20)
-            cout << "  Username must be 20 characters or fewer.\n";
+            cout << "Username must be 20 characters or fewer.\n";
         else if (value.find(',') != string::npos)
-            cout << "  Username cannot contain commas.\n";
+            cout << "Username cannot contain commas.\n";
         else
             return value;
     }
@@ -85,7 +85,7 @@ string getPassword(const string& prompt) {
         cout << prompt;
         cin >> value;
         if (value.size() >= 6) return value;
-        cout << "  Password must be at least 6 characters.\n";
+        cout << "Password must be at least 6 characters.\n";
     }
 }
 

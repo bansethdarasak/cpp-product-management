@@ -21,4 +21,6 @@ public:
     User* login();
     bool  signup();
     void  deleteUser(ProductCatalog& catalog);
+
+    const vector<User*>& getUsers() const { return users; }  // NEW
 };

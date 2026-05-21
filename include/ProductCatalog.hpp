@@ -10,9 +10,10 @@ class ProductCatalog {
 private:
     vector<Product> products;
     vector<Product> pending;
-    int             nextId;
     string          dataFile;
     string          pendingFile;
+
+    int getNextId() const;
 
 public:
     ProductCatalog(string dataFile, string pendingFile);
@@ -23,13 +24,24 @@ public:
     void updateProduct();
     void deleteProduct();
     void reviewPending();
-    void deleteByOwner(const string& username);  // wipe all products when user deleted
+    void deleteByOwner(const string& username);
+    void checkLowStock();
+    void viewAllUsers(const vector<class User*>& users);
 
     // User only
     void submitProduct(const string& username);
+    void takeOutProduct(const string& username);
+    void viewMyProducts(const string& username);
+    void requestUpdateProduct(const string& username); 
 
     // All users
     void viewByCategory();
     void searchProducts();
     void sortProducts();
+
+    // Paginated view (shared helper)
+    void viewPaginated(const vector<Product>& list, const string& title = "PRODUCTS");
+
+    // Returns count of products with stock < 3 (used for login alert)
+    int countLowStock() const;
 };

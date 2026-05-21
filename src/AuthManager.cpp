@@ -33,7 +33,7 @@ User* AuthManager::login() {
     for (auto* u : users)
         if (u->getUsername() == uname && u->getPassword() == pass)
             return u;
-    cout << "  Invalid credentials.\n";
+    cout << "Invalid credentials.\n";
     return nullptr;
 }
 
@@ -41,20 +41,20 @@ bool AuthManager::signup() {
     cout << "\n[ SIGN UP ]\n";
     string uname = getUsername("Username (3-20 chars, no spaces): ");
     if (usernameExists(uname)) {
-        cout << "  Username already taken.\n";
+        cout << "Username already taken.\n";
         return false;
     }
     string pass = getPassword("Password (min 6 chars): ");
     users.push_back(new RegularUser(uname, pass));
     saveAccounts(accountFile, users);
-    cout << "  Account created! You can now log in.\n";
+    cout << "Account created! You can now log in.\n";
     return true;
 }
 
 void AuthManager::deleteUser(ProductCatalog& catalog) {
     cout << "\n[ DELETE USER ACCOUNT ]\n";
 
-    cout << "  Regular accounts:\n";
+    cout << "Regular accounts:\n";
     bool any = false;
     for (auto* u : users) {
         if (!u->isAdmin()) {
@@ -63,32 +63,37 @@ void AuthManager::deleteUser(ProductCatalog& catalog) {
         }
     }
     if (!any) {
-        cout << "  No regular users found.\n";
+        cout << "No regular users found.\n";
         return;
     }
 
     flushLine();
-    string target = getNonEmptyString("Enter username to delete: ");
+    
+    string target = getOptionalString("Enter username to delete (or press Enter to cancel): ");
+    if (target.empty()) {
+        cout << "Cancelled.\n";
+        return;
+    }
 
     for (auto it = users.begin(); it != users.end(); it++) {
         if ((*it)->getUsername() == target) {
             if ((*it)->isAdmin()) {
-                cout << "  Cannot delete an admin account.\n";
+                cout << "Cannot delete an admin account.\n";
                 return;
             }
-            cout << "  Delete \"" << target << "\" and all their products? (y/n): ";
+            cout << "Delete \"" << target << "\" and all their products? (y/n): ";
             char c; cin >> c;
             if (c == 'y' || c == 'Y') {
-                catalog.deleteByOwner(target);   // wipe their products first
+                catalog.deleteByOwner(target);
                 delete *it;
                 users.erase(it);
                 saveAccounts(accountFile, users);
-                cout << "  User account deleted.\n";
+                cout << "User account deleted.\n";
             } else {
-                cout << "  Cancelled.\n";
+                cout << "Cancelled.\n";
             }
             return;
         }
     }
-    cout << "  Username not found.\n";
+    cout << "Username not found.\n";
 }
